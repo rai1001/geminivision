@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Simple glasses icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3,10 C3,7 5,5 8,5 C10,5 11,6 12,7 C13,6 14,5 16,5 C19,5 21,7 21,10 C21,13 19,15 16,15 C14,15 13,14 12,13 C11,14 10,15 8,15 C5,15 3,13 3,10 Z M5,10 C5,12 6,13 8,13 C10,13 11,12 11,10 C11,8 10,7 8,7 C6,7 5,8 5,10 Z M13,10 C13,12 14,13 16,13 C18,13 19,12 19,10 C19,8 18,7 16,7 C14,7 13,8 13,10 Z M1,10 L3,10 M21,10 L23,10" />
+</vector>

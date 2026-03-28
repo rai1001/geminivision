@@ -1,0 +1,26 @@
+{
+  "name": "geminivision-backend",
+  "version": "1.0.0",
+  "description": "GeminiVision WebSocket proxy — Ray-Ban Meta to Gemini Live API",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "test": "tsx test/mic-test.ts"
+  },
+  "dependencies": {
+    "ws": "^8.16.0",
+    "dotenv": "^16.4.0",
+    "jsonwebtoken": "^9.0.2",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/ws": "^8.5.10",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/uuid": "^9.0.8",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0"
+  }
+}
