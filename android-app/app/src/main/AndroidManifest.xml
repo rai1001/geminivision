@@ -30,9 +30,15 @@
         android:theme="@style/Theme.GeminiVision">
 
         <!-- Meta Wearables SDK config -->
+        <!-- En Developer Mode: value="0". En produccion: ID del Wearables Developer Center -->
         <meta-data
             android:name="com.meta.wearable.mwdat.APPLICATION_ID"
-            android:value="${applicationId}" />
+            android:value="0" />
+
+        <!-- Opt out de analytics de Meta -->
+        <meta-data
+            android:name="com.meta.wearable.mwdat.ANALYTICS_OPT_OUT"
+            android:value="true" />
 
         <activity
             android:name=".MainActivity"

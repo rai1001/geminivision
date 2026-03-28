@@ -33,10 +33,8 @@ class GeminiVisionApp : Application() {
 
     private fun initWearablesSdk() {
         try {
-            // Meta Wearables SDK initialization
-            // Wearables.initialize(this)
-            // TODO: Descomentar cuando el SDK esté disponible
-            android.util.Log.d("GeminiVision", "App inicializada (SDK pendiente)")
+            com.meta.wearable.dat.core.Wearables.initialize(this)
+            android.util.Log.d("GeminiVision", "Meta Wearables SDK inicializado")
         } catch (e: Exception) {
             android.util.Log.e("GeminiVision", "Error inicializando SDK: ${e.message}")
         }

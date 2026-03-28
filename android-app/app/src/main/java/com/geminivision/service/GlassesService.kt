@@ -21,6 +21,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 
 /**
  * Foreground Service que mantiene la conexión con las gafas y Gemini activa.
@@ -64,7 +65,7 @@ class GlassesService : Service() {
         // 1. WebSocket al backend
         wsClient = WebSocketClient(BuildConfig.BACKEND_URL)
         audioBridge = AudioBridge(this)
-        glassesManager = GlassesManager(this)
+        glassesManager = GlassesManager(application as Application)
 
         // 2. Escuchar mensajes del backend
         serviceScope.launch {
@@ -143,11 +144,19 @@ class GlassesService : Service() {
     }
 
     private fun connectGlasses() {
-        glassesManager.connect()
-        updateState { copy(glassesConnected = glassesManager.isConnected) }
-
-        // Reenviar frames de video al backend
         serviceScope.launch {
+            // En desarrollo, usar MockDevice
+            glassesManager.setupMockDevice()
+            updateState { copy(glassesConnected = glassesManager.isConnected) }
+
+            // Monitorear dispositivos
+            glassesManager.monitorDevices()
+
+            // Iniciar stream de video
+            delay(500) // esperar a que el mock device este listo
+            glassesManager.startStream()
+
+            // Reenviar frames JPEG al backend
             glassesManager.videoFrames.collect { jpegData ->
                 val base64 = Base64.encodeToString(jpegData, Base64.NO_WRAP)
                 wsClient.send(ClientMessage.Video(base64))
