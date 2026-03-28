@@ -193,7 +193,11 @@ val AVAILABLE_MODES = listOf(
     ModeInfo("standard", "General", "Asistente visual universal"),
     ModeInfo("desktop", "Escritorio", "Codigo, terminal, apps"),
     ModeInfo("translation", "Traductor", "Traduce texto visible"),
+    ModeInfo("capture", "Captura", "Pizarras, libretas, notas"),
+    ModeInfo("meeting", "Reunion", "Graba y resume reuniones"),
+    ModeInfo("brainstorm", "Brainstorming", "Ideacion y conexion de ideas"),
     ModeInfo("kitchen", "Cocina", "FIFO, albaranes, alergenos"),
+    ModeInfo("inventory", "Inventario", "Escanea productos y stock"),
     ModeInfo("accessibility", "Accesibilidad", "Describe el entorno"),
     ModeInfo("reading", "Lectura", "Lee documentos en voz alta"),
 )
