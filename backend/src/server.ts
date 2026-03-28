@@ -3,6 +3,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { v4 as uuidv4 } from 'uuid';
 import { generateToken, validateToken } from './auth.js';
 import { GeminiSession } from './geminiSession.js';
+import { getModeList } from './modes.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -27,6 +28,13 @@ const httpServer = http.createServer((req, res) => {
   if (req.method === 'GET' && req.url === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({ status: 'ok', timestamp: new Date().toISOString() }));
+    return;
+  }
+
+  // Lista de modos disponibles
+  if (req.method === 'GET' && req.url === '/api/modes') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ modes: getModeList() }));
     return;
   }
 
@@ -149,6 +157,16 @@ function handleMessage(ws: WebSocket, state: ClientState, msg: any): void {
       if (state.geminiSession) {
         state.geminiSession.sendFrame(msg.payload);
       }
+      break;
+
+    case 'changeMode':
+      // Cambiar modo = cerrar sesión actual y abrir nueva con nuevo prompt
+      console.log(`[Server] Cambio de modo: ${msg.mode} para ${state.sessionId}`);
+      state.geminiSession?.close();
+      startGeminiSession(ws, state, {
+        mode: msg.mode,
+        customPrompt: msg.customPrompt,
+      });
       break;
 
     case 'endSession':

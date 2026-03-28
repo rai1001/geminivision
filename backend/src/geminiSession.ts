@@ -3,10 +3,14 @@ import { EventEmitter } from 'events';
 import { sendAudioToGemini, extractAudioFromGemini } from './audioHandler.js';
 import { VideoHandler } from './videoHandler.js';
 import { handleFunctionCall } from './functionCalling.js';
+import { getMode, type AssistantMode } from './modes.js';
+
 export interface SessionConfig {
   systemInstruction?: string;
   voice?: string;
   useVideo?: boolean;
+  mode?: string; // ID del modo (standard, desktop, translation, kitchen, etc.)
+  customPrompt?: string; // para modo 'custom'
 }
 
 // Gemini Live API endpoint
@@ -48,10 +52,17 @@ export class GeminiSession extends EventEmitter {
   private isReconnecting = false;
   private isReady = false;
   private config: SessionConfig;
+  private activeMode: AssistantMode;
 
   constructor(config?: SessionConfig) {
     super();
     this.config = config || {};
+    this.activeMode = getMode(this.config.mode || 'standard');
+    // Para modo custom, usar el prompt del usuario
+    if (this.activeMode.id === 'custom' && this.config.customPrompt) {
+      this.activeMode = { ...this.activeMode, systemPrompt: this.config.customPrompt };
+    }
+    console.log(`[GeminiSession] Modo: ${this.activeMode.name}`);
   }
 
   async connect(): Promise<void> {
@@ -89,6 +100,9 @@ export class GeminiSession extends EventEmitter {
   private sendSetup(): void {
     if (!this.geminiWs || this.geminiWs.readyState !== WebSocket.OPEN) return;
 
+    const voice = this.config.voice || this.activeMode.voice || DEFAULT_VOICE;
+    const prompt = this.config.systemInstruction || this.activeMode.systemPrompt || DEFAULT_SYSTEM_INSTRUCTION;
+
     const setupMessage: any = {
       setup: {
         model: 'models/gemini-3.1-flash-live-preview',
@@ -97,14 +111,14 @@ export class GeminiSession extends EventEmitter {
           speechConfig: {
             voiceConfig: {
               prebuiltVoiceConfig: {
-                voiceName: this.config.voice || DEFAULT_VOICE,
+                voiceName: voice,
               },
             },
           },
         },
         systemInstruction: {
           parts: [{
-            text: this.config.systemInstruction || DEFAULT_SYSTEM_INSTRUCTION,
+            text: prompt,
           }],
         },
         tools: [], // Fase 2: function declarations aquí

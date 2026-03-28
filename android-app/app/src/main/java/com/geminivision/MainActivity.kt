@@ -186,6 +186,18 @@ class MainActivity : ComponentActivity() {
 
 // --- Compose UI ---
 
+// Modos disponibles
+data class ModeInfo(val id: String, val name: String, val description: String)
+
+val AVAILABLE_MODES = listOf(
+    ModeInfo("standard", "General", "Asistente visual universal"),
+    ModeInfo("desktop", "Escritorio", "Codigo, terminal, apps"),
+    ModeInfo("translation", "Traductor", "Traduce texto visible"),
+    ModeInfo("kitchen", "Cocina", "FIFO, albaranes, alergenos"),
+    ModeInfo("accessibility", "Accesibilidad", "Describe el entorno"),
+    ModeInfo("reading", "Lectura", "Lee documentos en voz alta"),
+)
+
 @Composable
 fun GeminiVisionScreen(
     state: ServiceState,
@@ -194,6 +206,8 @@ fun GeminiVisionScreen(
     onDisconnect: () -> Unit
 ) {
     val isActive = state.wsConnected && state.authenticated
+    var selectedMode by remember { mutableStateOf(AVAILABLE_MODES[0]) }
+    var showModeSelector by remember { mutableStateOf(false) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -223,12 +237,103 @@ fun GeminiVisionScreen(
                 color = Color(0xFF888888)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Selector de modo
+            Card(
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E)),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { showModeSelector = !showModeSelector }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text(
+                            text = selectedMode.name,
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Text(
+                            text = selectedMode.description,
+                            color = Color(0xFF888888),
+                            fontSize = 12.sp
+                        )
+                    }
+                    Text(
+                        text = if (showModeSelector) "^" else "v",
+                        color = Color(0xFF4285F4),
+                        fontSize = 18.sp
+                    )
+                }
+            }
+
+            // Lista de modos desplegable
+            if (showModeSelector) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF252525)),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column {
+                        AVAILABLE_MODES.forEach { mode ->
+                            val isSelected = mode.id == selectedMode.id
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(
+                                        if (isSelected) Color(0xFF2A3A5A) else Color.Transparent
+                                    )
+                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                    modifier = Modifier.weight(1f)
+                                ) {
+                                    Text(
+                                        text = mode.name,
+                                        color = if (isSelected) Color(0xFF90CAF9) else Color.White,
+                                        fontSize = 14.sp,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                    Text(
+                                        text = mode.description,
+                                        color = Color(0xFF666666),
+                                        fontSize = 11.sp
+                                    )
+                                }
+                                if (!isSelected) {
+                                    Button(
+                                        onClick = {
+                                            selectedMode = mode
+                                            showModeSelector = false
+                                        },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = Color(0xFF333333)
+                                        ),
+                                        shape = RoundedCornerShape(8.dp)
+                                    ) {
+                                        Text("Usar", fontSize = 12.sp)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Estado de conexion
             StatusIndicators(state)
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Error
             state.lastError?.let { error ->
